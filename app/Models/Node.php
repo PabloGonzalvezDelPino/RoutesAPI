@@ -9,6 +9,6 @@ class Node extends Model
 {
     use HasFactory;
     public function route(){
-        return $this->belongsTo(Route::class);
+        return $this->belongsTo(Connection::class);
     }
 }

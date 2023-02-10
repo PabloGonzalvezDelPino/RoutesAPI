@@ -13,6 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('nodes');
         Schema::create('nodes', function (Blueprint $table) {
             $table->id();
             $table->text('name')->unique();

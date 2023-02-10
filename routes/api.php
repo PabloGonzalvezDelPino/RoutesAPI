@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NodesController;
-use App\Http\Controllers\RoutesController;
+use App\Http\Controllers\ConnectionsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,11 +21,12 @@ Route::prefix('/nodes')->group(function(){
     Route::delete('/delete', [NodesController::class, 'delete']);
     Route::get('/list', [NodesController::class, 'list']);
 });
-Route::prefix('/routes')->group(function(){
-    Route::put('/create', [RoutesController::class, 'create']);
-    Route::post('/edit', [RoutesController::class, 'edit']);
-    Route::delete('/delete', [RoutesController::class, 'delete']);
-    Route::get('/list', [RoutesController::class, 'list']);
+Route::prefix('/connections')->group(function(){
+    Route::put('/create', [ConnectionsController::class, 'create']);
+    Route::post('/edit', [ConnectionsController::class, 'edit']);
+    Route::delete('/delete', [ConnectionsController::class, 'delete']);
+    Route::get('/list', [ConnectionsController::class, 'list']);
+    Route::get('/getShorterRoute', [ConnectionsController::class, 'getShorterRoute']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
