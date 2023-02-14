@@ -8,7 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Node extends Model
 {
     use HasFactory;
-    public function route(){
-        return $this->belongsTo(Connection::class);
+    public function origins(){
+        return $this->hasMany(Connection::class,'origin');
+    }
+    public function destinations(){
+        return $this->hasMany(Connection::class,'destination');
     }
 }

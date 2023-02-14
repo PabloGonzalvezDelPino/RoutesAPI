@@ -115,18 +115,12 @@ class ConnectionsController extends Controller
     }
     public function getShorterRoute(Request $request){
         $json = $request->getContent();
-
         $data = json_decode($json);
 
         if($data){
-            $originConnections = Connection::with(['origin','destination'])
-            ->where('origin', '=', $data->origin)
-            ->get();
-
-            $connections = Connection::with(['origin','destination'])
-            ->where('origin', '!=', $data->origin)
-            ->get();
-
+            $allNodes = Node::with(['origins','destinations'])->get();
+            return ResponseGenerator::generateResponse("OK", 200, $allNodes , "Todos los nodos"); 
+        
             $allRoutes = [];
 
             foreach($originConnections as $origin){
@@ -147,7 +141,6 @@ class ConnectionsController extends Controller
             return ResponseGenerator::generateResponse("OK", 200, $this->getFastestRoute($allRoutes) , "Ruta más rápida"); 
         }
     }
-
     public function getFastestRoute($allRoutes) {
         $minTime = 0;
         $fastestRoute = null;
