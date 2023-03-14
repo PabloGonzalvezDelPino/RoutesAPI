@@ -26,7 +26,7 @@ Route::prefix('/connections')->group(function(){
     Route::post('/edit', [ConnectionsController::class, 'edit']);
     Route::delete('/delete', [ConnectionsController::class, 'delete']);
     Route::get('/list', [ConnectionsController::class, 'list']);
-    Route::get('/getShorterRoute', [ConnectionsController::class, 'getShorterRoute']);
+    Route::post('/getShorterRoute', [ConnectionsController::class, 'getShorterRoute']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

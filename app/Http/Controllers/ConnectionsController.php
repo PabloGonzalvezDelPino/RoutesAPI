@@ -43,7 +43,6 @@ class ConnectionsController extends Controller
         }else{
             return ResponseGenerator::generateResponse("KO", 494, null, "Data no encontrada");
         }
-
     }
     public function edit(Request $request){
         $json = $request->getContent();
@@ -118,45 +117,77 @@ class ConnectionsController extends Controller
         $data = json_decode($json);
 
         if($data){
+            //Compruebo que el destino y el origen sean diferentes
+            if($data->origin == $data->destination){
+                return ResponseGenerator::generateResponse("KO", 403, null, "El origen y el destino coinciden"); 
+            }
+            $allConections = [];
+            //Obtengo todas las conexiones y junto los arrays de conexiones
             $allNodes = Node::with(['origins','destinations'])->get();
-            return ResponseGenerator::generateResponse("OK", 200, $allNodes , "Todos los nodos"); 
-        
+            foreach(json_decode($allNodes) as $node){
+                $node->origins = array_merge($node->origins, $node->destinations);
+                $node->destinations = [];
+                array_push($allConections, $node); 
+            }
+            $originNode = 0;
+            $destinationNode = 0;
+            //Encuentro las ids de origen y destino
+            foreach($allConections as $con){
+                if($con->name == $data->origin){
+                    $originNode = $con;
+                }
+                if($con->name == $data->destination){
+                    $destinationNode = $con;
+                } 
+            }
+            if(empty($originNode) || empty($destinationNode) ){
+                return ResponseGenerator::generateResponse("KO", 404, null, "No se han encontrado esos nodos");
+            }
+            
+            $times = []; 
+            $path = [];
+            $visited = [];
             $allRoutes = [];
-
-            foreach($originConnections as $origin){
-                $route = [$origin];
-                foreach($connections as $connection){
-                    if($origin->destination == $connection->origin){
-                        array_push($route, $connection);
-                        if($connection->destination == $data->destination){
-                            array_push($allRoutes, $route);
-                            $route = [];
-                        }else{
-                            $origin = $connection;
-                        }
+            $routeTime = 0;
+            $this->searchRoutes($allConections,$originNode,$destinationNode,$path,$visited,$times,$routeTime,$allRoutes,$data->direction);
+            $min = min($times);
+            $porro = array_search($min, $times);
+            $fastestRoute = $allRoutes[array_search($min, $times)];
+            return ResponseGenerator::generateResponse("OK", 200, $fastestRoute , "Ruta encontrada");
+        }
+    }
+    public function searchRoutes($nodes,$start,$end,$path,&$visited, &$times,&$routeTime,&$allRoutes,$direction){
+        $caminoEncontrado = false;
+        $path[] = $start;
+        if($start == $end){
+            $caminoEncontrado = $path;
+            $times[] = $routeTime;
+            $routeTime = 0;
+            $allRoutes[] = $caminoEncontrado;
+        }else {
+            foreach($nodes[$start->id -1]->origins as $origen){
+                if($origen->origin == $start->id  && !in_array($origen,$visited) && $origen->unidirectional == $direction){
+                    $visited[] = $origen;
+                    $routeTime += $origen->distance/$origen->speed;
+                    $respuesta = $this->searchRoutes($nodes,$nodes[$origen->destination-1],$end,$path,$visited, $times,$routeTime,$allRoutes,$direction);
+                    if($respuesta && !$caminoEncontrado){
+                        
+                        $caminoEncontrado = $respuesta;
+                    }
+                }
+                if($origen->destination == $start->id && !in_array($origen, $visited)&& $origen->unidirectional == $direction){
+                    $visited[] = $origen;
+                    $routeTime += $origen->distance/$origen->speed;
+                    $respuesta = $this->searchRoutes($nodes,$nodes[$origen->origin-1],$end,$path,$visited, $times,$routeTime,$allRoutes,$direction);
+                    if($respuesta && !$caminoEncontrado){
+                        
+                        $caminoEncontrado = $respuesta;
                     }
                 }
             }
-
-            return ResponseGenerator::generateResponse("OK", 200, $this->getFastestRoute($allRoutes) , "Ruta más rápida"); 
         }
+        
+        return $allRoutes;
     }
-    public function getFastestRoute($allRoutes) {
-        $minTime = 0;
-        $fastestRoute = null;
-        foreach($allRoutes as $routes){
-            $totalTime = 0;
-            foreach($routes as $route){
-                $totalTime += $route->distance/$route->speed;
-            }
-            if($minTime == 0){
-                $minTime = $totalTime;
-                $fastestRoute = $routes;
-            }else if($totalTime < $minTime){
-                $minTime = $totalTime;
-                $fastestRoute = $routes;
-            }
-        }
-        return $fastestRoute;
-    }
+    
 }
