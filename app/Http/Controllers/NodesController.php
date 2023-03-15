@@ -26,12 +26,12 @@ class NodesController extends Controller
                     $node->save();
                     return ResponseGenerator::generateResponse("OK", 200, $node, "Nodo Guardado");
                 }catch(\Exception $e){
-                    return ResponseGenerator::generateResponse("KO", 494, $e, "Error al guardar");
+                    return ResponseGenerator::generateResponse("KO", 400, $e, "Error al guardar");
                 }
             }
 
         }else{
-            return ResponseGenerator::generateResponse("KO", 494, null, "Data no encontrada");
+            return ResponseGenerator::generateResponse("KO", 404, null, "Data no encontrada");
         }
     }
     public function delete(Request $request){
@@ -50,12 +50,12 @@ class NodesController extends Controller
                     $node->delete();
                     return ResponseGenerator::generateResponse("OK", 200, null, "Nodo Borrado");
                 }catch(\Exception $e){
-                    return ResponseGenerator::generateResponse("KO", 494, $e, "Error al borrar");
+                    return ResponseGenerator::generateResponse("KO", 400, $e, "Error al borrar");
                 }
-            }
+            }   
 
         }else{
-            return ResponseGenerator::generateResponse("KO", 494, null, "Data no encontrada");
+            return ResponseGenerator::generateResponse("KO", 404, null, "Data no encontrada");
         }
     }
     public function edit(Request $request){
@@ -76,21 +76,21 @@ class NodesController extends Controller
                     $node->save();
                     return ResponseGenerator::generateResponse("OK", 200, $node, "Nodo Actualizado");
                 }catch(\Exception $e){
-                    return ResponseGenerator::generateResponse("KO", 494, $e, "Error al Actualizar");
+                    return ResponseGenerator::generateResponse("KO", 400, $e, "Error al Actualizar");
                 }
             }
 
         }else{
-            return ResponseGenerator::generateResponse("KO", 494, null, "Data no encontrada");
+            return ResponseGenerator::generateResponse("KO", 404, null, "Data no encontrada");
         }
     }
     public function list(){
     
         try{
             $nodes = Node::all();
-            return ResponseGenerator::generateResponse("OK", 200, $nodes , "Nodos AcEncontradostualizado");
+            return ResponseGenerator::generateResponse("OK", 200, $nodes , "Nodos Encontrados Correctamente");
         }catch(\Exception $e){
-            return ResponseGenerator::generateResponse("KO", 494, $e, "Error al Buscar");
+            return ResponseGenerator::generateResponse("KO", 404, $e, "Data no encontrada");
         }
         
     }

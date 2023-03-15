@@ -37,17 +37,16 @@ class ConnectionsController extends Controller
                     $connection->save();
                     return ResponseGenerator::generateResponse("OK", 200, $connection, "Ruta Guardada");
                 }catch(\Exception $e){
-                    return ResponseGenerator::generateResponse("KO", 494, $e, "Error al guardar");
+                    return ResponseGenerator::generateResponse("KO", 400, $e, "Error al guardar");
                 }
             }
         }else{
-            return ResponseGenerator::generateResponse("KO", 494, null, "Data no encontrada");
+            return ResponseGenerator::generateResponse("KO", 404, null, "Data no encontrada");
         }
     }
     public function edit(Request $request){
         $json = $request->getContent();
         $data = json_decode($json);
-
         if($data){
             $validate = Validator::make(json_decode($json,true), [
                 'id' => 'required|numeric|exists:connections,id',
@@ -61,7 +60,7 @@ class ConnectionsController extends Controller
             if($validate->fails()){
                 return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
             }else {
-                $connection = Conenction::find($data->id);
+                $connection = Connection::find($data->id);
                 $connection->name = $data->name;
                 $connection->origin = $data->origin;
                 $connection->destination = $data->destination;
@@ -72,13 +71,12 @@ class ConnectionsController extends Controller
                     $connection->save();
                     return ResponseGenerator::generateResponse("OK", 200, $connection, "Ruta Guardada");
                 }catch(\Exception $e){
-                    return ResponseGenerator::generateResponse("KO", 494, $e, "Error al guardar");
+                    return ResponseGenerator::generateResponse("KO", 400, $e, "Error al guardar");
                 }
             }
         }else{
-            return ResponseGenerator::generateResponse("KO", 494, null, "Data no encontrada");
+            return ResponseGenerator::generateResponse("KO", 404, null, "Data no encontrada");
         }
-
     }
     public function delete(Request $request){
         $json = $request->getContent();
@@ -96,20 +94,19 @@ class ConnectionsController extends Controller
                     $connection->delete();
                     return ResponseGenerator::generateResponse("OK", 200, $connection, "Ruta Eliminada");
                 }catch(\Exception $e){
-                    return ResponseGenerator::generateResponse("KO", 494, $e, "Error al Eliminar");
+                    return ResponseGenerator::generateResponse("KO", 400, $e, "Error al Eliminar");
                 }
             }
         }else{
-            return ResponseGenerator::generateResponse("KO", 494, null, "Data no encontrada");
+            return ResponseGenerator::generateResponse("KO", 404, null, "Data no encontrada");
         }
-
     }
     public function list(){
         try{
             $connections = Connection::all();
-            return ResponseGenerator::generateResponse("OK", 200, $connections , "Rutas AcEncontradostualizado");
+            return ResponseGenerator::generateResponse("OK", 200, $connections , "Rutas Encontradas Correctamente");
         }catch(\Exception $e){
-            return ResponseGenerator::generateResponse("KO", 494, $e, "Error al Buscar");
+            return ResponseGenerator::generateResponse("KO", 404, $e, "Data No Encontrada");
         }
     }
     public function getShorterRoute(Request $request){
@@ -152,14 +149,20 @@ class ConnectionsController extends Controller
             $this->searchRoutes($allConections,$originNode,$destinationNode,$path,$visited,$times,$routeTime,$allRoutes,$data->direction);
             if(!empty($times)){
                 $min = min($times);
-                $porro = array_search($min, $times);
-                $fastestRoute = $allRoutes[array_search($min, $times)];
-                return ResponseGenerator::generateResponse("OK", 200, $fastestRoute , "Ruta encontrada");
+                $fastestRoute = $allRoutes[array_search($min, $times)]; 
+                return ResponseGenerator::generateResponse("OK", 200, [$this->showTheFastestRoute($fastestRoute),$fastestRoute] , "Ruta encontrada");
             }else{
                 return ResponseGenerator::generateResponse("KO", 404, null , "No se han encontrado rutas");
             }
-            
         }
+    }
+    public function showTheFastestRoute($fastestRoute){
+        $resultado = [];
+        $resultado[] = "El camino más corto es: ";
+        foreach($fastestRoute as $node){
+            $resultado[] =$node->name . " (id: $node->id)";
+        }
+        return $resultado;
     }
     public function searchRoutes($nodes,$start,$end,$path,&$visited, &$times,&$routeTime,&$allRoutes,$direction){
         $caminoEncontrado = false;
