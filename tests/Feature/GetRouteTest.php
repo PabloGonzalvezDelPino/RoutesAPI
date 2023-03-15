@@ -12,7 +12,7 @@ class GetRouteTest extends TestCase
         $notFoundNode = $this->postJson('/api/connections/getShorterRoute', ["origin"=>"Valencia","destination"=>"Palencia","direction"=>1]);
         $notFoundNode
             ->assertStatus(200)
-            ->assertJsonFragment([
+            ->assertJson([
                 'code' => 404,
                 'message' => "No se han encontrado esos nodos"
             ]);
@@ -21,25 +21,25 @@ class GetRouteTest extends TestCase
         $notFoundNode = $this->postJson('/api/connections/getShorterRoute', ["origin"=>"Barcelona","destination"=>"Barcelona","direction"=>1]);
         $notFoundNode
             ->assertStatus(200)
-            ->assertJsonFragment([
+            ->assertJson([
                 'code' => 403,
                 'message' => "El origen y el destino coinciden"
             ]);
     }
     public function test_ruta_inexistente_o_inalcanzable(){
-        $notFoundNode = $this->postJson('/api/connections/getShorterRoute', ["origin"=>"Madrid","destination"=>"Valhalla","direction"=>1]);
+        $notFoundNode = $this->postJson('/api/connections/getShorterRoute', ["origin"=>"Lugo","destination"=>"Castilla","direction"=>1]);
         $notFoundNode
             ->assertStatus(200)
-            ->assertJsonFragment([
+            ->assertJson([
                 'code' => 404,
                 'message' => "No se han encontrado rutas"
             ]);
     }
     public function test_ruta_correcta(){
-        $notFoundNode = $this->postJson('/api/connections/getShorterRoute', ["origin"=>"Torrecilla","destination"=>"Barcelona","direction"=>1]);
+        $notFoundNode = $this->postJson('/api/connections/getShorterRoute', ["origin"=>"Talavera","destination"=>"Barcelona","direction"=>1]);
         $notFoundNode
             ->assertStatus(200)
-            ->assertJsonFragment([
+            ->assertJson([
                 'code' => 200,
                 'message' => "Ruta encontrada"
             ]);

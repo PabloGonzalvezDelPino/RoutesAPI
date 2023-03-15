@@ -140,22 +140,23 @@ class ConnectionsController extends Controller
             //return ResponseGenerator::generateResponse("KO", 404, [$originNode,$destinationNode], "No se han encontrado esos nodos");
             if(empty($originNode) || empty($destinationNode) ){
                 return ResponseGenerator::generateResponse("KO", 404, null, "No se han encontrado esos nodos");
+            }
+            
+            $times = []; 
+            $path = [];
+            $visited = [];
+            $allRoutes = [];
+            $routeTime = 0;
+            $this->searchRoutes($allConections,$originNode,$destinationNode,$path,$visited,$times,$routeTime,$allRoutes,$data->direction);
+            if(!empty($times)){
+                $min = min($times);
+                $fastestRoute = $allRoutes[array_search($min, $times)]; 
+                //return ResponseGenerator::generateResponse("OK", 200, $allRoutes , "Ruta encontrada");
+                return ResponseGenerator::generateResponse("OK", 200, [$this->showTheFastestRoute($fastestRoute),$fastestRoute] , "Ruta encontrada");
             }else{
-                $times = []; 
-                $path = [];
-                $visited = [];
-                $allRoutes = [];
-                $routeTime = 0;
-                $this->searchRoutes($allConections,$originNode,$destinationNode,$path,$visited,$times,$routeTime,$allRoutes,$data->direction);
-                if(!empty($times)){
-                    $min = min($times);
-                    $fastestRoute = $allRoutes[array_search($min, $times)]; 
-                    //return ResponseGenerator::generateResponse("OK", 200, $allRoutes , "Ruta encontrada");
-                    return ResponseGenerator::generateResponse("OK", 200, [$this->showTheFastestRoute($fastestRoute),$fastestRoute] , "Ruta encontrada");
-                }else{
-                    return ResponseGenerator::generateResponse("KO", 404, null , "No se han encontrado rutas");
-                }
-            } 
+                return ResponseGenerator::generateResponse("KO", 404, null , "No se han encontrado rutas");
+            }
+            
         }
     }
     public function showTheFastestRoute($fastestRoute){
