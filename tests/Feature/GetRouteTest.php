@@ -27,7 +27,7 @@ class GetRouteTest extends TestCase
             ]);
     }
     public function test_ruta_inexistente_o_inalcanzable(){
-        $notFoundNode = $this->postJson('/api/connections/getShorterRoute', ["origin"=>"F","destination"=>"H","direction"=>1]);
+        $notFoundNode = $this->postJson('/api/connections/getShorterRoute', ["origin"=>"A","destination"=>"E","direction"=>1]);
         $notFoundNode
             ->assertStatus(200)
             ->assertJson([
@@ -36,7 +36,7 @@ class GetRouteTest extends TestCase
             ]);
     }
     public function test_ruta_correcta(){
-        $notFoundNode = $this->postJson('/api/connections/getShorterRoute', ["origin"=>"A","destination"=>"C","direction"=>1]);
+        $notFoundNode = $this->postJson('/api/connections/getShorterRoute', ["origin"=>"A","destination"=>"B","direction"=>0]);
         $notFoundNode
             ->assertStatus(200)
             ->assertJson([
