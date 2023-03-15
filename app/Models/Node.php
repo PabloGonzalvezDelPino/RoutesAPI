@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Node extends Model
 {
     use HasFactory;
+    public $timestamps = false;
     public function origins(){
         return $this->hasMany(Connection::class,'origin');
     }

@@ -137,23 +137,25 @@ class ConnectionsController extends Controller
                     $destinationNode = $con;
                 } 
             }
+            //return ResponseGenerator::generateResponse("KO", 404, [$originNode,$destinationNode], "No se han encontrado esos nodos");
             if(empty($originNode) || empty($destinationNode) ){
                 return ResponseGenerator::generateResponse("KO", 404, null, "No se han encontrado esos nodos");
-            }
-            
-            $times = []; 
-            $path = [];
-            $visited = [];
-            $allRoutes = [];
-            $routeTime = 0;
-            $this->searchRoutes($allConections,$originNode,$destinationNode,$path,$visited,$times,$routeTime,$allRoutes,$data->direction);
-            if(!empty($times)){
-                $min = min($times);
-                $fastestRoute = $allRoutes[array_search($min, $times)]; 
-                return ResponseGenerator::generateResponse("OK", 200, [$this->showTheFastestRoute($fastestRoute),$fastestRoute] , "Ruta encontrada");
             }else{
-                return ResponseGenerator::generateResponse("KO", 404, null , "No se han encontrado rutas");
-            }
+                $times = []; 
+                $path = [];
+                $visited = [];
+                $allRoutes = [];
+                $routeTime = 0;
+                $this->searchRoutes($allConections,$originNode,$destinationNode,$path,$visited,$times,$routeTime,$allRoutes,$data->direction);
+                if(!empty($times)){
+                    $min = min($times);
+                    $fastestRoute = $allRoutes[array_search($min, $times)]; 
+                    //return ResponseGenerator::generateResponse("OK", 200, $allRoutes , "Ruta encontrada");
+                    return ResponseGenerator::generateResponse("OK", 200, [$this->showTheFastestRoute($fastestRoute),$fastestRoute] , "Ruta encontrada");
+                }else{
+                    return ResponseGenerator::generateResponse("KO", 404, null , "No se han encontrado rutas");
+                }
+            } 
         }
     }
     public function showTheFastestRoute($fastestRoute){
@@ -164,7 +166,7 @@ class ConnectionsController extends Controller
         }
         return $resultado;
     }
-    public function searchRoutes($nodes,$start,$end,$path,&$visited, &$times,&$routeTime,&$allRoutes,$direction){
+    public function searchRoutes($nodes,$start,$end,$path,$visited, &$times,&$routeTime,&$allRoutes,$direction){
         $caminoEncontrado = false;
         $path[] = $start;
         if($start == $end){
@@ -173,7 +175,7 @@ class ConnectionsController extends Controller
             $routeTime = 0;
             $allRoutes[] = $caminoEncontrado;
         }else {
-            foreach($nodes[$start->id -1]->origins as $origen){
+            foreach($nodes[$start->id-1]->origins as $origen){
                 if($origen->origin == $start->id  && !in_array($origen,$visited) && $origen->unidirectional == $direction){
                     $visited[] = $origen;
                     $routeTime += $origen->distance/$origen->speed;
